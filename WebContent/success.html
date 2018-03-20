@@ -1,0 +1,102 @@
+<html>
+  <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Checkout with PayPal Demo</title>
+      <!--Including Bootstrap style files-->
+      <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+      <style>
+          /* http://angrytools.com/gradient/ */
+          .bg-color {
+              color: white;
+              background: -moz-linear-gradient(0deg, #004094 0%, #0096D9 50%, #004094 100%); /* ff3.6+ */
+              background: -webkit-gradient(linear, left top, right top, color-stop(0%, #004094), color-stop(50%, #0096D9), color-stop(100%, #004094)); /* safari4+,chrome */
+              background: -webkit-linear-gradient(0deg, #004094 0%, #0096D9 50%, #004094 100%); /* safari5.1+,chrome10+ */
+              background: -o-linear-gradient(0deg, #004094 0%, #0096D9 50%, #004094 100%); /* opera 11.10+ */
+              background: -ms-linear-gradient(0deg, #004094 0%, #0096D9 50%, #004094 100%); /* ie10+ */
+              background: linear-gradient(90deg, #004094 0%, #0096D9 50%, #004094 100%); /* w3c */
+              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#004094', endColorstr='#004094',GradientType=1 ); /* ie6-9 */
+          }
+          .mark{
+              max-width: 45%;
+          }
+          .mark-input-field{
+              height:30px !important;
+          }
+      </style>
+  </head>
+  <body>
+      <div class="container-fluid">
+		  <div class="well bg-color">
+			  <h2 class="text-center">Checkout with PayPal Demo</h2>
+			  <h4 class="text-center">REST API with Checkout.js v4</h4>
+		  </div>
+		  
+		  <div class="row">
+			 	<div class="col-md-4 col-md-offset-4">
+							<div class="loader" style="margin-left: 150px;">
+								<i  class="fa fa-refresh fa-spin" style="font-size:30px"></i>
+							</div>
+							<div class="loader" style="margin-top:10px; margin-left:80px">Loading transaction details ...</div>
+							<!-- Display the Transaction Details-->
+							<div id="show_transactions">
+								<h4> 
+									<div id="firstName"></div>
+									<div id="lastName"></div>Thank you for your Order 
+								</h4>
+								<h4> Shipping Details: </h4>
+								<div id="shipToName"></div>
+								<div id="shipToStreet"></div>
+								<div id="shipToCity"></div>
+								<div id="shipToState"></div>
+								<div id="shipToZip"></div>
+								<div><strong>Transaction ID:</strong> <span id="transactionId"></span> </div>
+								<div><strong>Transaction Type: </strong><span id="transactionType"></span> </div>
+								<div><strong>Payment Total Amount:</strong><span id="amt"></span>  </div>
+								<div><strong>Currency Code:</strong><span id="currencyCode"></span>  </div>
+								<div><strong>Payment Status:</strong><span id="paymentStatus"></dispanv>  </div>
+								<div><strong>Payment Type: </strong><span id="paymentType"></span> </div>
+								<div> <strong>Click <a href='/' id='go_back'>here </a> to return to Home Page</strong></div>
+							</div>
+						
+				</div> 
+			</div>
+		</div>  <!--Container-Fluid ends here -->
+		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+		<script src="https://code.jquery.com/jquery.js"></script>
+		
+		<script> 
+			$( document ).ready(function() {
+				// set back url 
+				var url = location.pathname.split("/")[1]; url = '/'+url+'/'
+				$('#go_back').attr('href',url);
+				$("#show_transactions").hide(); // hide the contents on load
+				function qs(key) {
+				    key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&"); // escape RegEx meta chars
+				    var match = location.search.match(new RegExp("[?&]"+key+"=([^&]+)(&|$)"));
+				    return match && decodeURIComponent(match[1].replace(/\+/g, " "));
+				}
+				var token = qs("token");
+				var payerID = qs("payerID");
+				$.post("SucessPageServlet?token="+token+"&payerID="+payerID, function( data ) {
+					  
+						$("#shipToName").html(data.payer.payer_info.shipping_address.recipient_name);
+						$("#shipToStreet").html(data.payer.payer_info.shipping_address.line1 + ", " + (data.payer.payer_info.shipping_address.line2 || ""));
+						$("#shipToCity").html(data.payer.payer_info.shipping_address.city);
+						$("#shipToState").html(data.payer.payer_info.shipping_address.state);
+						$("#shipToZip").html(data.payer.payer_info.shipping_address.postal_code);
+						$("#transactionId").html(data.id);
+						$("#transactionType").html(data.intent);
+						$("#amt").html(data.transactions[0].amount.total);
+						$("#currencyCode").html(data.transactions[0].amount.currency);
+						$("#paymentStatus").html(data.state);
+						$("#paymentType").html(data.payer.payment_method);
+						$(".loader").hide();
+						$("#show_transactions").show()
+				});
+			});
+		</script> 
+	</body>
+</html> 		
+		
